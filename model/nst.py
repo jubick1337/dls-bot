@@ -42,7 +42,6 @@ class NST:
     def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor, input_image: torch.Tensor,
                             num_steps=500,
                             style_weight=100000, content_weight=1) -> torch.Tensor:
-        """Run the style transfer."""
         model, style_losses, content_losses = self._get_style_model_and_losses(content_image, style_image)
         optimizer = get_input_optimizer(input_image)
         run = [0]
@@ -67,8 +66,8 @@ class NST:
                 loss.backward()
 
                 run[0] += 1
-                if run[0] % 50 == 0:
-                    return style_score + content_score
+
+                return style_score + content_score
 
             optimizer.step(closure)
         input_image.data.clamp_(0, 1)
