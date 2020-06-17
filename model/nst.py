@@ -30,8 +30,8 @@ class NST:
         self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
 
     def transform(self, content_image: Image, style_image: Image):
-        content_image = self._loader(content_image)
-        style_image = self._loader(style_image)
+        content_image = self._image_loader(content_image)
+        style_image = self._image_loader(style_image)
         return self._run_style_transfer(content_image, style_image, content_image.clone())
 
     def _image_loader(self, image_name) -> torch.Tensor:
