@@ -19,25 +19,25 @@ def get_input_optimizer(input_img):
 
 class NST:
     def __init__(self, image_size: int):
-        self.image_size = image_size
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.loader = transforms.Compose([
-            transforms.Resize(self.image_size),
-            transforms.CenterCrop(self.image_size),
+        self._image_size = image_size
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self._loader = transforms.Compose([
+            transforms.Resize(self._image_size),
+            transforms.CenterCrop(self._image_size),
             transforms.ToTensor()])
-        self.cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self.device)
-        self.cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self.device)
-        self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
+        self._cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self._device)
+        self._cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self._device)
+        self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
 
     def transform(self, content_image: Image, style_image: Image):
-        content_image = self.loader(content_image)
-        style_image = self.loader(style_image)
+        content_image = self._loader(content_image)
+        style_image = self._loader(style_image)
         return self._run_style_transfer(content_image, style_image, content_image.clone())
 
-    def _image_loader(self, image_name):
+    def _image_loader(self, image_name) -> torch.Tensor:
         image = Image.open(image_name)
-        image = self.loader(image).unsqueeze(0)
-        return image.to(self.device, torch.float)
+        image = self._loader(image).unsqueeze(0)
+        return image.to(self._device, torch.float)
 
     def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor, input_image: torch.Tensor,
                             num_steps=500,
@@ -78,9 +78,9 @@ class NST:
     def _get_style_model_and_losses(self, content_img: torch.Tensor, style_img: torch.Tensor,
                                     content_layers=CONTENT_LAYERS_DEFAULT,
                                     style_layers=STYLE_LAYERS_DEFAULT) -> (nn.Sequential, List, List):
-        cnn = copy.deepcopy(self.cnn)
+        cnn = copy.deepcopy(self._cnn)
 
-        normalization = Normalization(self.cnn_normalization_mean, self.cnn_normalization_std).to(self.device)
+        normalization = Normalization(self._cnn_normalization_mean, self._cnn_normalization_std).to(self._device)
 
         content_losses = []
         style_losses = []
