@@ -6,14 +6,12 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils import executor
-from flask import Flask
 
 from model.nst import NST
 
 TELEGRAM_TOKEN = '1109017372:AAG7i7w4mDWlY9oUqaDQW8rN2NM105OODZ4'
 
 bot = Bot(token=TELEGRAM_TOKEN)
-server = Flask(__name__)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
