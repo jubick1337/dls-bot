@@ -28,20 +28,26 @@ class NST:
         self._cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self._device)
         self._cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self._device)
         self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
+        self._unloader = transforms.ToPILImage()
 
-    def transform(self, content_image: Image, style_image: Image):
-        content_image = self._image_loader(content_image)
-        style_image = self._image_loader(style_image)
-        return self._run_style_transfer(content_image, style_image, content_image.clone())
+    def unload(self, tensor):
+        with torch.no_grad():
+            return self._unloader(tensor.squeeze_(0))
 
-    def _image_loader(self, image_name) -> torch.Tensor:
+    async def transform(self, content_image: str, style_image: str) -> Image:
+        content_image = await self._image_loader(content_image)
+        style_image = await self._image_loader(style_image)
+        return await (self._run_style_transfer(content_image, style_image, content_image.clone()))
+
+    async def _image_loader(self, image_name: str) -> torch.Tensor:
         image = Image.open(image_name)
         image = self._loader(image).unsqueeze(0)
         return image.to(self._device, torch.float)
 
-    def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor, input_image: torch.Tensor,
-                            num_steps=500,
-                            style_weight=100000, content_weight=1) -> torch.Tensor:
+    async def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor,
+                                  input_image: torch.Tensor,
+                                  num_steps=500,
+                                  style_weight=100000, content_weight=1) -> torch.Tensor:
         model, style_losses, content_losses = self._get_style_model_and_losses(content_image, style_image)
         optimizer = get_input_optimizer(input_image)
         run = [0]
@@ -66,7 +72,6 @@ class NST:
                 loss.backward()
 
                 run[0] += 1
-
                 return style_score + content_score
 
             optimizer.step(closure)
