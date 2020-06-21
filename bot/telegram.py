@@ -1,20 +1,21 @@
-TELEGRAM_TOKEN = '1109017372:AAG7i7w4mDWlY9oUqaDQW8rN2NM105OODZ4'
-
 import logging
 import ssl
+from pathlib import Path
 
 import telebot
 from aiohttp import web
 
+TELEGRAM_TOKEN = '1109017372:AAG7i7w4mDWlY9oUqaDQW8rN2NM105OODZ4'
+
 WEBHOOK_HOST = '35.204.74.60'
-WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
-WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+WEBHOOK_PORT = 8443
+WEBHOOK_LISTEN = '0.0.0.0'
 
-WEBHOOK_SSL_CERT = '../key/url_cert.pem'  # Path to the ssl certificate
-WEBHOOK_SSL_PRIV = '../key/url_private.key'  # Path to the ssl private key
+WEBHOOK_SSL_CERT = Path('../key/url_cert.pem')  # Path to the ssl certificate
+WEBHOOK_SSL_PRIV = Path('../key/url_private.key')  # Path to the ssl private key
 
-WEBHOOK_URL_BASE = "https://{}:{}".format(WEBHOOK_HOST, WEBHOOK_PORT)
-WEBHOOK_URL_PATH = "/{}/".format(TELEGRAM_TOKEN)
+WEBHOOK_URL_BASE = f'https://{WEBHOOK_HOST}:{WEBHOOK_PORT}'
+WEBHOOK_URL_PATH = f'/{TELEGRAM_TOKEN}/'
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -24,7 +25,6 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = web.Application()
 
 
-# Process webhook calls
 async def handle(request):
     if request.match_info.get('token') == bot.token:
         request_body_dict = await request.json()
@@ -38,32 +38,23 @@ async def handle(request):
 app.router.add_post('/{token}/', handle)
 
 
-# Handle '/start' and '/help'
-@bot.message_handler(commands=['help', 'start'])
-def send_welcome(message):
-    bot.reply_to(message,
-                 ("Hi there, I am EchoBot.\n"
-                  "I am here to echo your kind words back to you."))
+@bot.message_handler(commands=['start'])
+def greet(message):
+    bot.reply_to(message, "Hi there, type one of commands: /nst")
 
 
-# Handle all other messages
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def echo_message(message):
-    bot.reply_to(message, message.text)
+@bot.message_handler(commands=['nst'])
+def start_nst(message):
+    bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
 
 
-# Remove webhook, it fails sometimes the set if there is a previous webhook
 bot.remove_webhook()
-
-# Set webhook
 bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
                 certificate=open(WEBHOOK_SSL_CERT, 'r'))
 
-# Build ssl context
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 context.load_cert_chain(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV)
 
-# Start aiohttp server
 web.run_app(
     app,
     host=WEBHOOK_LISTEN,
