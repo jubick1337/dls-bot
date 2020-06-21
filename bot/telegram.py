@@ -1,21 +1,14 @@
 import logging
 import ssl
-from pathlib import Path
 
 import telebot
 from aiohttp import web
+from telebot.types import Message
 
-TELEGRAM_TOKEN = '1109017372:AAG7i7w4mDWlY9oUqaDQW8rN2NM105OODZ4'
-
-WEBHOOK_HOST = '35.204.74.60'
-WEBHOOK_PORT = 8443
-WEBHOOK_LISTEN = '0.0.0.0'
-
-WEBHOOK_SSL_CERT = Path('../key/url_cert.pem')  # Path to the ssl certificate
-WEBHOOK_SSL_PRIV = Path('../key/url_private.key')  # Path to the ssl private key
-
-WEBHOOK_URL_BASE = f'https://{WEBHOOK_HOST}:{WEBHOOK_PORT}'
-WEBHOOK_URL_PATH = f'/{TELEGRAM_TOKEN}/'
+from bot import db_worker
+from bot.utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV, TELEGRAM_TOKEN, States, \
+    WEBHOOK_LISTEN, WEBHOOK_PORT
+from model.nst import NST
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -39,13 +32,55 @@ app.router.add_post('/{token}/', handle)
 
 
 @bot.message_handler(commands=['start'])
-def greet(message):
-    bot.reply_to(message, "Hi there, type one of commands: /nst")
+def greet(message: Message):
+    bot.reply_to(message, 'Hi there, type one of commands: /nst')
+    db_worker.set_state(message.chat.id, States.START.value)
+
+
+@bot.message_handler(commands=['reset'])
+def cmd_reset(message: Message):
+    bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
+    db_worker.set_state(message.chat.id, States.START.value)
 
 
 @bot.message_handler(commands=['nst'])
-def start_nst(message):
+def start_nst(message: Message):
     bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
+    db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
+
+
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value)
+def get_content(message: Message):
+    if len(message.photo == 0):
+        bot.reply_to(message, 'Something went wrong. Try again:(')
+        return
+
+    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id))
+
+    with open(f'content{message.chat.id}', 'wb') as file:
+        file.write(downloaded_file)
+
+    bot.send_message(message.chat.id, 'now send me second photo')
+    db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
+
+
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value)
+def get_content(message: Message):
+    if len(message.photo == 0):
+        bot.reply_to(message, 'Something went wrong. Try again:(')
+        return
+
+    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id))
+
+    with open(f'style{message.chat.id}', 'wb') as file:
+        file.write(downloaded_file)
+
+    model = NST(128)
+    res = await model.transform(f'content{message.chat.id}.jpg', f'style{message.chat.id}.jpg')
+    model.unload(res).save(f'res{message.chat.id}.jpg')
+
+    bot.send_photo(message.chat.id, f'res{message.chat.id}.jpg')
+    db_worker.set_state(message.chat.id, States.START.value)
 
 
 bot.remove_webhook()
