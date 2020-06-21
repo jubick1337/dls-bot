@@ -54,7 +54,7 @@ def start_nst(message: Message):
 def get_content(message: Message):
     downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
-    with open(f'./images/content{message.chat.id}', 'wb') as file:
+    with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
         file.write(downloaded_file)
 
     bot.send_message(message.chat.id, 'now send me second photo')
@@ -66,7 +66,7 @@ def get_content(message: Message):
 def get_style(message: Message):
     downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
-    with open(f'./images/style{message.chat.id}', 'wb') as file:
+    with open(f'./images/style{message.chat.id}.jpg', 'wb') as file:
         file.write(downloaded_file)
 
     model = NST(128)
