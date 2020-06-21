@@ -1,6 +1,5 @@
+import utils
 from vedis import Vedis
-
-from bot import utils
 
 
 def get_current_state(user_id):
