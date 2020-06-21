@@ -1,2 +1,2 @@
 runtime: python37
-entrypoint: python3 bot/telegram.py
+entrypoint: python3 tg/telegram.py

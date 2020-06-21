@@ -1,14 +1,14 @@
 import logging
 import ssl
 
-import db_worker
 import telebot
 from aiohttp import web
 from telebot.types import Message
-from utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV, TELEGRAM_TOKEN, States, \
-    WEBHOOK_LISTEN, WEBHOOK_PORT
 
 from model.nst import NST
+from tg import db_worker
+from tg.utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV, TELEGRAM_TOKEN, States, \
+    WEBHOOK_LISTEN, WEBHOOK_PORT
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)

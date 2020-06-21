@@ -1,5 +1,6 @@
-import utils
 from vedis import Vedis
+
+from tg import utils
 
 
 def get_current_state(user_id):
