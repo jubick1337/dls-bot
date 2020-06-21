@@ -65,7 +65,7 @@ def get_content(message: Message):
 
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value)
-def get_content(message: Message):
+async def get_content(message: Message):
     if len(message.photo == 0):
         bot.reply_to(message, 'Something went wrong. Try again:(')
         return
