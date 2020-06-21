@@ -1,11 +1,11 @@
 import logging
 import ssl
 
+import db_worker
 import telebot
 from aiohttp import web
 from telebot.types import Message
 
-from bot import db_worker
 from bot.utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV, TELEGRAM_TOKEN, States, \
     WEBHOOK_LISTEN, WEBHOOK_PORT
 from model.nst import NST
