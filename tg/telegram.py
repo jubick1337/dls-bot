@@ -51,6 +51,7 @@ def start_nst(message: Message):
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value)
 def get_content(message: Message):
+    logger.info(message.photo)
     if len(message.photo == 0):
         bot.reply_to(message, 'Something went wrong. Try again:(')
         return
