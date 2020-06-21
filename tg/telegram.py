@@ -52,7 +52,7 @@ def start_nst(message: Message):
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
                      content_types=["photo"])
 def get_content(message: Message):
-    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id))
+    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
     with open(f'content{message.chat.id}', 'wb') as file:
         file.write(downloaded_file)
@@ -64,7 +64,7 @@ def get_content(message: Message):
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value,
                      content_types=["photo"])
 async def get_content(message: Message):
-    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id))
+    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
     with open(f'style{message.chat.id}', 'wb') as file:
         file.write(downloaded_file)
