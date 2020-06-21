@@ -1,4 +1,5 @@
 import logging
+import os
 import ssl
 
 import telebot
@@ -69,11 +70,16 @@ def get_style(message: Message):
     with open(f'./images/style{message.chat.id}.jpg', 'wb') as file:
         file.write(downloaded_file)
 
-    model = NST(128)
+    model = NST(512)
     res = model.transform(f'./images/content{message.chat.id}.jpg', f'./images/style{message.chat.id}.jpg')
     model.unload(res).save(f'./images/res{message.chat.id}.jpg')
 
     bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
+
+    for file in ['content', 'style', 'res']:
+        if os.path.exists(f'./images{file}{message.chat.id}.jpg'):
+            os.remove(f'./images{file}{message.chat.id}.jpg')
+
     db_worker.set_state(message.chat.id, States.START.value)
 
 
