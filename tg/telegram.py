@@ -63,14 +63,14 @@ def get_content(message: Message):
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value,
                      content_types=["photo"])
-async def get_content(message: Message):
+def get_content(message: Message):
     downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
     with open(f'style{message.chat.id}', 'wb') as file:
         file.write(downloaded_file)
 
     model = NST(128)
-    res = await model.transform(f'content{message.chat.id}.jpg', f'style{message.chat.id}.jpg')
+    res = model.transform(f'content{message.chat.id}.jpg', f'style{message.chat.id}.jpg')
     model.unload(res).save(f'res{message.chat.id}.jpg')
 
     bot.send_photo(message.chat.id, f'res{message.chat.id}.jpg')

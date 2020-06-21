@@ -34,20 +34,21 @@ class NST:
         with torch.no_grad():
             return self._unloader(tensor.squeeze_(0))
 
-    async def transform(self, content_image: str, style_image: str) -> Image:
-        content_image = await self._image_loader(content_image)
-        style_image = await self._image_loader(style_image)
-        return await (self._run_style_transfer(content_image, style_image, content_image.clone()))
+    def transform(self, content_image: str, style_image: str) -> Image:
+        print('transform started')
+        content_image = self._image_loader(content_image)
+        style_image = self._image_loader(style_image)
+        return self._run_style_transfer(content_image, style_image, content_image.clone())
 
-    async def _image_loader(self, image_name: str) -> torch.Tensor:
+    def _image_loader(self, image_name: str) -> torch.Tensor:
         image = Image.open(image_name)
         image = self._loader(image).unsqueeze(0)
         return image.to(self._device, torch.float)
 
-    async def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor,
-                                  input_image: torch.Tensor,
-                                  num_steps=500,
-                                  style_weight=100000, content_weight=1) -> torch.Tensor:
+    def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor,
+                            input_image: torch.Tensor,
+                            num_steps=500,
+                            style_weight=100000, content_weight=1) -> torch.Tensor:
         model, style_losses, content_losses = self._get_style_model_and_losses(content_image, style_image)
         optimizer = get_input_optimizer(input_image)
         run = [0]
