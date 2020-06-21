@@ -29,7 +29,6 @@ class NST:
         self._cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self._device)
         self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
         self._unloader = transforms.ToPILImage()
-        print(f'device: {self.device}')
 
     def unload(self, tensor):
         with torch.no_grad():
