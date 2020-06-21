@@ -49,7 +49,8 @@ def start_nst(message: Message):
     db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
 
 
-@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value)
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
+                     content_types=["photo"])
 def get_content(message: Message):
     print(f'ph:{message.photo}')
     logger.info(message.photo)
@@ -66,7 +67,8 @@ def get_content(message: Message):
     db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
 
-@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value)
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value,
+                     content_types=["photo"])
 async def get_content(message: Message):
     if len(message.photo == 0):
         bot.reply_to(message, 'Something went wrong. Try again:(')
