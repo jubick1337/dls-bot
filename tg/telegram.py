@@ -60,12 +60,12 @@ def cmd_reset(message: Message):
 @bot.message_handler(commands=['nst'])
 def start_nst(message: Message):
     try:
-        bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
+        bot.reply_to(message, 'Now send me content photo')
         db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
     except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
         logger.info('smth went wrong')
         time.sleep(0.5)
-        bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
+        bot.reply_to(message, 'Now send me content photo')
         db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
 
 
@@ -77,12 +77,12 @@ def get_content(message: Message):
     with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
         file.write(downloaded_file)
     try:
-        bot.send_message(message.chat.id, 'now send me second photo')
+        bot.send_message(message.chat.id, 'now send me style photo')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
     except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
         logger.info('smth went wrong')
         time.sleep(0.5)
-        bot.send_message(message.chat.id, 'now send me second photo')
+        bot.send_message(message.chat.id, 'now send me style photo')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
 
