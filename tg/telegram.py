@@ -17,7 +17,7 @@ from tg.utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHO
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
 
-bot = telebot.AsyncTeleBot(TELEGRAM_TOKEN)
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 app = web.Application()
 
@@ -92,30 +92,28 @@ def start_nst(message: Message):
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
                      content_types=['photo'])
-async def get_content(message: Message):
+def get_content(message: Message):
     try:
-        file = await bot.get_file(message.photo[-1].file_id)
-        downloaded_file = await bot.download_file(file.file_path)
+        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
 
-        await bot.send_message(message.chat.id, 'Now send me style photo. If you want to specify '
-                                                'size send it within your style photo. '
-                                                'Size should be less than 512.')
+        bot.send_message(message.chat.id, 'Now send me style photo. If you want to specify '
+                                          'size send it within your style photo. '
+                                          'Size should be less than 512.')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
     except:
         logger.info('smth went wrong')
         time.sleep(5)
-        file = await bot.get_file(message.photo[-1].file_id)
-        downloaded_file = await bot.download_file(file.file_path)
+        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
 
-        await bot.send_message(message.chat.id, 'Now send me style photo. If you want to specify '
-                                                'size send it within your style photo. '
-                                                'Size should be less than 512.')
+        bot.send_message(message.chat.id,
+                         'Now send me style photo. If you want to specify size send it within your style photo. '
+                         'Size should be less than 512.')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
 
