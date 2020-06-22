@@ -111,7 +111,7 @@ def get_style(message: Message):
             file.write(downloaded_file)
 
         if message.caption:
-            if 1 <= int(message.caption) <= 1024:
+            if 1 <= int(message.caption) <= 512:
                 model = NST(int(message.caption))
             else:
                 model = NST(256)
