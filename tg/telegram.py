@@ -77,16 +77,22 @@ def start_nst(message: Message):
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
                      content_types=['photo'])
 def get_content(message: Message):
-    downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
-
-    with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
-        file.write(downloaded_file)
     try:
+        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
+
+        with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
+            file.write(downloaded_file)
+
         bot.send_message(message.chat.id, 'now send me style photo')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
     except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
         logger.info('smth went wrong')
         time.sleep(0.5)
+        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
+
+        with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
+            file.write(downloaded_file)
+
         bot.send_message(message.chat.id, 'now send me style photo')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
