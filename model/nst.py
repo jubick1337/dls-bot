@@ -23,7 +23,6 @@ class NST:
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._loader = transforms.Compose([
             transforms.Resize(self._image_size),
-            transforms.CenterCrop(self._image_size),
             transforms.ToTensor()])
         self._cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self._device)
         self._cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self._device)
