@@ -1,6 +1,7 @@
 import logging
 import os
 import ssl
+import time
 
 import telebot
 from aiohttp import web
@@ -34,20 +35,38 @@ app.router.add_post('/{token}/', handle)
 
 @bot.message_handler(commands=['start'])
 def greet(message: Message):
-    bot.reply_to(message, 'Hi there, type one of commands: /nst')
-    db_worker.set_state(message.chat.id, States.START.value)
+    try:
+        bot.reply_to(message, 'Hi there, type one of commands: /nst')
+        db_worker.set_state(message.chat.id, States.START.value)
+    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+        logger.info('smth went wrong')
+        time.sleep(0.5)
+        bot.reply_to(message, 'Hi there, type one of commands: /nst')
+        db_worker.set_state(message.chat.id, States.START.value)
 
 
 @bot.message_handler(commands=['reset'])
 def cmd_reset(message: Message):
-    bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
-    db_worker.set_state(message.chat.id, States.START.value)
+    try:
+        bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
+        db_worker.set_state(message.chat.id, States.START.value)
+    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+        logger.info('smth went wrong')
+        time.sleep(0.5)
+        bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
+        db_worker.set_state(message.chat.id, States.START.value)
 
 
 @bot.message_handler(commands=['nst'])
 def start_nst(message: Message):
-    bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
-    db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
+    try:
+        bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
+        db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
+    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+        logger.info('smth went wrong')
+        time.sleep(0.5)
+        bot.reply_to(message, 'Now send me two photos. First for content and second for style.')
+        db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
 
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
@@ -57,9 +76,14 @@ def get_content(message: Message):
 
     with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
         file.write(downloaded_file)
-
-    bot.send_message(message.chat.id, 'now send me second photo')
-    db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
+    try:
+        bot.send_message(message.chat.id, 'now send me second photo')
+        db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
+    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+        logger.info('smth went wrong')
+        time.sleep(0.5)
+        bot.send_message(message.chat.id, 'now send me second photo')
+        db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
 
 @bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value,
@@ -73,14 +97,18 @@ def get_style(message: Message):
     model = NST(128)
     res = model.transform(f'./images/content{message.chat.id}.jpg', f'./images/style{message.chat.id}.jpg')
     model.unload(res).save(f'./images/res{message.chat.id}.jpg')
-
-    bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
+    try:
+        bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
+        db_worker.set_state(message.chat.id, States.START.value)
+    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+        logger.info('smth went wrong')
+        time.sleep(0.5)
+        bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
+        db_worker.set_state(message.chat.id, States.START.value)
 
     for file in ['content', 'style', 'res']:
         if os.path.exists(f'./images{file}{message.chat.id}.jpg'):
             os.remove(f'./images{file}{message.chat.id}.jpg')
-
-    db_worker.set_state(message.chat.id, States.START.value)
 
 
 bot.remove_webhook()
