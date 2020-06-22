@@ -17,7 +17,7 @@ from tg.utils import WEBHOOK_URL_BASE, WEBHOOK_URL_PATH, WEBHOOK_SSL_CERT, WEBHO
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
 
-bot = telebot.TeleBot(TELEGRAM_TOKEN)
+bot = telebot.AsyncTeleBot(TELEGRAM_TOKEN)
 
 app = web.Application()
 
