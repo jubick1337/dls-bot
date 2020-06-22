@@ -43,9 +43,9 @@ def greet(message: Message):
     try:
         bot.reply_to(message, 'Hi there, type one of commands: /nst')
         db_worker.set_state(message.chat.id, States.START.value)
-    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+    except:
         logger.info('smth went wrong')
-        time.sleep(0.5)
+        time.sleep(5)
         bot.reply_to(message, 'Hi there, type one of commands: /nst')
         db_worker.set_state(message.chat.id, States.START.value)
 
@@ -55,9 +55,9 @@ def cmd_reset(message: Message):
     try:
         bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
         db_worker.set_state(message.chat.id, States.START.value)
-    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+    except:
         logger.info('smth went wrong')
-        time.sleep(0.5)
+        time.sleep(5)
         bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst')
         db_worker.set_state(message.chat.id, States.START.value)
 
@@ -67,9 +67,9 @@ def start_nst(message: Message):
     try:
         bot.reply_to(message, 'Now send me content photo')
         db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
-    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+    except:
         logger.info('smth went wrong')
-        time.sleep(0.5)
+        time.sleep(5)
         bot.reply_to(message, 'Now send me content photo')
         db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
 
@@ -85,9 +85,9 @@ def get_content(message: Message):
 
         bot.send_message(message.chat.id, 'now send me style photo')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
-    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+    except:
         logger.info('smth went wrong')
-        time.sleep(0.5)
+        time.sleep(5)
         downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
@@ -117,9 +117,9 @@ def get_style(message: Message):
             if os.path.exists(f'./images{file}{message.chat.id}.jpg'):
                 os.remove(f'./images{file}{message.chat.id}.jpg')
 
-    except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+    except:
         logger.info('smth went wrong')
-        time.sleep(0.5)
+        time.sleep(5)
         downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 
         with open(f'./images/style{message.chat.id}.jpg', 'wb') as file:
