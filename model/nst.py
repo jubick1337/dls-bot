@@ -35,7 +35,9 @@ class NST:
 
     def transform(self, content_image: str, style_image: str) -> Image:
         content_image = self._image_loader(content_image)
+        print(content_image.shape)
         style_image = self._image_loader(style_image)
+        print(style_image.shape)
         return self._run_style_transfer(content_image, style_image, content_image.clone())
 
     def _image_loader(self, image_name: str) -> torch.Tensor:
