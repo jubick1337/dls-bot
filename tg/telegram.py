@@ -94,7 +94,8 @@ def start_nst(message: Message):
                      content_types=['photo'])
 def get_content(message: Message):
     try:
-        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
+        file = bot.get_file(message.photo[-1].file_id).wait()
+        downloaded_file = bot.download_file(file.file_path).wait()
 
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
@@ -106,7 +107,9 @@ def get_content(message: Message):
     except:
         logger.info('smth went wrong')
         time.sleep(5)
-        downloaded_file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
+
+        file = bot.get_file(message.photo[-1].file_id).wait()
+        downloaded_file = bot.download_file(file.file_path).wait()
 
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
