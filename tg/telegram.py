@@ -109,7 +109,8 @@ def get_style(message: Message):
 
         with open(f'./images/style{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
-
+        print(message.text)
+        print(message.text.isdigit())
         if message.text.isdigit():
             if 1 <= int(message.text) <= 512:
                 model = NST(message.text)
