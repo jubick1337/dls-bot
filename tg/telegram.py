@@ -62,6 +62,22 @@ def cmd_reset(message: Message):
         db_worker.set_state(message.chat.id, States.START.value)
 
 
+@bot.message_handler(commands=['help'])
+def get_help(message: Message):
+    try:
+        bot.reply_to(message,
+                     'Type /nst to start neural style transfer. Then send photo which will be '
+                     'used as content. In a very next message send photo which will be used as style. You can '
+                     'also request for size of result within second message. Just type it like 384. (default is 256).')
+    except:
+        logger.info('smth went wrong')
+        time.sleep(5)
+        bot.reply_to(message,
+                     'Type /nst to start neural style transfer. Then send photo which will be '
+                     'used as content. In a very next message send photo which will be used as style. You can '
+                     'also request for size of result within second message. Just type it like 384. (default is 256).')
+
+
 @bot.message_handler(commands=['nst'])
 def start_nst(message: Message):
     try:
