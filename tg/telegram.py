@@ -6,6 +6,7 @@ import time
 import telebot
 from aiohttp import web
 from aiohttp.abc import Request
+from telebot import apihelper
 from telebot.types import Message
 
 from model.nst import NST
@@ -19,6 +20,9 @@ telebot.logger.setLevel(logging.INFO)
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 app = web.Application()
+
+apihelper.proxy = {
+    'https': 'socks5://student:TH8FwlMMwWvbJF8FYcq0@178.128.203.1:1080'}
 
 
 async def handle(request: Request):
