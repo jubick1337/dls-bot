@@ -30,7 +30,6 @@ class NST:
         self._unloader = transforms.ToPILImage()
 
     def unload(self, tensor: torch.Tensor) -> Image.Image:
-        print(tensor.shape)
         with torch.no_grad():
             return self._unloader(tensor.squeeze_(0))
 
