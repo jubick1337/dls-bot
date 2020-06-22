@@ -5,6 +5,7 @@ import time
 
 import telebot
 from aiohttp import web
+from aiohttp.abc import Request
 from telebot.types import Message
 
 from model.nst import NST
@@ -20,7 +21,7 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = web.Application()
 
 
-async def handle(request):
+async def handle(request: Request):
     if request.match_info.get('token') == bot.token:
         request_body_dict = await request.json()
         update = telebot.types.Update.de_json(request_body_dict)

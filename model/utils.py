@@ -16,7 +16,7 @@ class Normalization(nn.Module):
         self.mean = torch.tensor(mean).view(-1, 1, 1)
         self.std = torch.tensor(std).view(-1, 1, 1)
 
-    def forward(self, img):
+    def forward(self, img: torch.Tensor) -> torch.Tensor:
         return (img - self.mean) / self.std
 
 

@@ -2,7 +2,7 @@ import copy
 from typing import List
 
 import torch
-import torch.optim as optim
+import torch.optim as optimizers
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
@@ -13,7 +13,7 @@ from model.utils import CONTENT_LAYERS_DEFAULT, STYLE_LAYERS_DEFAULT, Normalizat
 
 
 def get_input_optimizer(input_img):
-    optimizer = optim.LBFGS([input_img.requires_grad_()])
+    optimizer = optimizers.LBFGS([input_img.requires_grad_()])
     return optimizer
 
 
@@ -30,12 +30,11 @@ class NST:
         self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
         self._unloader = transforms.ToPILImage()
 
-    def unload(self, tensor):
+    def unload(self, tensor: torch.Tensor) -> Image.Image:
         with torch.no_grad():
             return self._unloader(tensor.squeeze_(0))
 
     def transform(self, content_image: str, style_image: str) -> Image:
-        print('transform started')
         content_image = self._image_loader(content_image)
         style_image = self._image_loader(style_image)
         return self._run_style_transfer(content_image, style_image, content_image.clone())

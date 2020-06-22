@@ -1,21 +1,20 @@
 from vedis import Vedis
 
-from tg import utils
+from tg.utils import States, db_file
 
 
-def get_current_state(user_id):
-    with Vedis(utils.db_file) as db:
+def get_current_state(user_id: str) -> States:
+    with Vedis(db_file) as db:
         try:
-            return db[user_id].decode()  # Если используете Vedis версии ниже, чем 0.7.1, то .decode() НЕ НУЖЕН
-        except KeyError:  # Если такого ключа почему-то не оказалось
-            return utils.States.S_START.value  # значение по умолчанию - начало диалога
+            return db[user_id].decode()
+        except KeyError:
+            return States.START.value
 
 
-def set_state(user_id, value):
-    with Vedis(utils.db_file) as db:
+def set_state(user_id: str, value: str) -> bool:
+    with Vedis(db_file) as db:
         try:
             db[user_id] = value
             return True
         except:
-            # тут желательно как-то обработать ситуацию
             return False
