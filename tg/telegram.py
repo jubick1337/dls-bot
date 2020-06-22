@@ -83,7 +83,9 @@ def get_content(message: Message):
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
 
-        bot.send_message(message.chat.id, 'now send me style photo')
+        bot.send_message(message.chat.id, 'Now send me style photo. If you want to specify '
+                                          'size send it within your style photo. '
+                                          'Size should be less than 512.')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
     except:
         logger.info('smth went wrong')
@@ -93,7 +95,9 @@ def get_content(message: Message):
         with open(f'./images/content{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
 
-        bot.send_message(message.chat.id, 'now send me style photo')
+        bot.send_message(message.chat.id,
+                         'Now send me style photo. If you want to specify size send it within your style photo. '
+                         'Size should be less than 512.')
         db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
 
 
@@ -106,7 +110,13 @@ def get_style(message: Message):
         with open(f'./images/style{message.chat.id}.jpg', 'wb') as file:
             file.write(downloaded_file)
 
-        model = NST(128)
+        if message.text.isdigit():
+            if 1 <= int(message.text) <= 512:
+                model = NST(message.text)
+            else:
+                model = NST(256)
+        else:
+            model = NST(256)
         res = model.transform(f'./images/content{message.chat.id}.jpg', f'./images/style{message.chat.id}.jpg')
         model.unload(res).save(f'./images/res{message.chat.id}.jpg')
 

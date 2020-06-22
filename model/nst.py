@@ -46,7 +46,7 @@ class NST:
 
     def _run_style_transfer(self, content_image: torch.Tensor, style_image: torch.Tensor,
                             input_image: torch.Tensor,
-                            num_steps=500,
+                            num_steps=300,
                             style_weight=100000, content_weight=1) -> torch.Tensor:
         model, style_losses, content_losses = self._get_style_model_and_losses(content_image, style_image)
         optimizer = get_input_optimizer(input_image)
