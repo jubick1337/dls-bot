@@ -21,4 +21,5 @@ class States(Enum):
     ENTER_COMMAND = '1'
     ENTER_FIRST_PIC = '2'
     ENTER_SECOND_PIC = '3'
-    FINISH = '4'
+    ENTER_SRRES_PHOTO = '4'
+    FINISH = '5'
