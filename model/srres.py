@@ -12,7 +12,7 @@ class SRRes:
         self._net = GeneratorResNet().to(self._device).eval()
         self._net.load_state_dict(torch.load('./generator_5.pth', map_location=self._device))
         self._loader = transforms.Compose([
-            transforms.Resize(512, Image.BICUBIC),
+            transforms.Resize(512 / 4, Image.BICUBIC),
             transforms.ToTensor(),
             transforms.Normalize(np.array([0.485, 0.456, 0.406]),
                                  np.array([0.229, 0.224, 0.225]))
