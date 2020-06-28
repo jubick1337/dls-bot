@@ -198,7 +198,8 @@ def get_style(message: Message):
         else:
             model = NST(256)
         res = model.transform(f'./images/content{message.chat.id}.jpg', f'./images/style{message.chat.id}.jpg')
-        model.unload(res).save(f'./images/res{message.chat.id}.jpg')
+        save_image(res, f'./images/res{message.chat.id}.jpg')
+        # model.unload(res).save(f'./images/res{message.chat.id}.jpg')
 
         bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
         db_worker.set_state(message.chat.id, States.START.value)

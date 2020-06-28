@@ -27,6 +27,3 @@ class SRRes:
     def transform(self, input_image: str) -> torch.Tensor:
         image = self._image_loader(input_image)
         return self._net(image)
-        # res = self._net(image)
-        # with torch.no_grad():
-        #     return self._unloader(res.squeeze_(0))
