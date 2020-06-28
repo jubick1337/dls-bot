@@ -79,19 +79,12 @@ def cmd_reset(message: Message):
 
 
 @bot.message_handler(commands=['help'])
+@gce_wrapper
 def get_help(message: Message):
-    try:
-        bot.reply_to(message,
-                     'Type /nst to start neural style transfer. Then send photo which will be '
-                     'used as content. In a very next message send photo which will be used as style. You can '
-                     'also request for size of result within second message. Just type it like 384. (default is 256).')
-    except:
-        logger.info('smth went wrong')
-        time.sleep(5)
-        bot.reply_to(message,
-                     'Type /nst to start neural style transfer. Then send photo which will be '
-                     'used as content. In a very next message send photo which will be used as style. You can '
-                     'also request for size of result within second message. Just type it like 384. (default is 256).')
+    bot.reply_to(message,
+                 'Type /nst to start neural style transfer. Then send photo which will be '
+                 'used as content. In a very next message send photo which will be used as style. You can '
+                 'also request for size of result within second message. Just type it like 384. (default is 256).')
 
 
 @bot.message_handler(commands=['nst'])
