@@ -1,9 +1,8 @@
-import numpy as np
 import torch
 from PIL import Image
 from torchvision.transforms import transforms
 
-from model.utils import GeneratorResNet
+from model.utils import GeneratorResNet, CNN_NORMALIZATION_MEAN, CNN_NORMALIZATION_STD
 
 
 class SRRes:
@@ -14,16 +13,15 @@ class SRRes:
         self._loader = transforms.Compose([
             transforms.Resize(512, Image.BICUBIC),
             transforms.ToTensor(),
-            transforms.Normalize(np.array([0.485, 0.456, 0.406]),
-                                 np.array([0.229, 0.224, 0.225]))
+            transforms.Normalize(CNN_NORMALIZATION_MEAN,
+                                 CNN_NORMALIZATION_STD)
         ])
-        self._unloader = transforms.ToPILImage()
+
+    def transform(self, input_image: str) -> torch.Tensor:
+        image = self._image_loader(input_image)
+        return self._net(image)
 
     def _image_loader(self, image_name: str) -> torch.Tensor:
         image = Image.open(image_name)
         image = self._loader(image).unsqueeze(0)
         return image.to(self._device, torch.float)
-
-    def transform(self, input_image: str) -> torch.Tensor:
-        image = self._image_loader(input_image)
-        return self._net(image)

@@ -1,5 +1,13 @@
+import numpy as np
 import torch
 from torch import nn
+
+CONTENT_LAYERS_DEFAULT = ['conv_4']
+STYLE_LAYERS_DEFAULT = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
+
+CNN_NORMALIZATION_MEAN = np.array([0.485, 0.456, 0.406])
+
+CNN_NORMALIZATION_STD = np.array([0.229, 0.224, 0.225])
 
 
 def gram_matrix(input_tensor: torch.Tensor) -> torch.Tensor:
@@ -18,10 +26,6 @@ class Normalization(nn.Module):
 
     def forward(self, img: torch.Tensor) -> torch.Tensor:
         return (img - self.mean) / self.std
-
-
-CONTENT_LAYERS_DEFAULT = ['conv_4']
-STYLE_LAYERS_DEFAULT = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
 
 class ResidualBlock(nn.Module):
@@ -59,7 +63,6 @@ class GeneratorResNet(nn.Module):
         upsampling = []
         for out_features in range(2):
             upsampling += [
-                # nn.Upsample(scale_factor=2),
                 nn.Conv2d(64, 256, 3, 1, 1),
                 nn.BatchNorm2d(256),
                 nn.PixelShuffle(upscale_factor=2),

@@ -9,7 +9,8 @@ from PIL import Image
 from torch import nn
 
 from model.losses import ContentLoss, StyleLoss
-from model.utils import CONTENT_LAYERS_DEFAULT, STYLE_LAYERS_DEFAULT, Normalization
+from model.utils import CONTENT_LAYERS_DEFAULT, STYLE_LAYERS_DEFAULT, Normalization, CNN_NORMALIZATION_MEAN, \
+    CNN_NORMALIZATION_STD
 
 
 def get_input_optimizer(input_img):
@@ -24,14 +25,9 @@ class NST:
         self._loader = transforms.Compose([
             transforms.Resize(self._image_size),
             transforms.ToTensor()])
-        self._cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self._device)
-        self._cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self._device)
+        self._cnn_normalization_mean = torch.tensor(CNN_NORMALIZATION_MEAN).to(self._device)
+        self._cnn_normalization_std = torch.tensor(CNN_NORMALIZATION_STD).to(self._device)
         self._cnn = models.vgg19(pretrained=True).features.to(self._device).eval()
-        self._unloader = transforms.ToPILImage()
-
-    def unload(self, tensor: torch.Tensor) -> Image.Image:
-        with torch.no_grad():
-            return self._unloader(tensor.squeeze_(0))
 
     def transform(self, content_image: str, style_image: str) -> Image:
         content_image = self._image_loader(content_image)
@@ -50,6 +46,7 @@ class NST:
         model, style_losses, content_losses = self._get_style_model_and_losses(content_image, style_image)
         optimizer = get_input_optimizer(input_image)
         run = [0]
+
         while run[0] <= num_steps:
 
             def closure():
