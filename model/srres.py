@@ -10,7 +10,7 @@ class SRRes:
     def __init__(self):
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._net = GeneratorResNet().to(self._device)
-        self._net.load_state_dict(torch.load('../model/generator_5.pth', map_location=self._device))
+        self._net.load_state_dict(torch.load('./generator_5.pth', map_location=self._device))
         self._loader = transforms.Compose([
             transforms.Resize(512, Image.BICUBIC),
             transforms.ToTensor(),
