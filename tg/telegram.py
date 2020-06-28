@@ -41,13 +41,13 @@ app.router.add_post('/{token}/', handle)
 
 
 def gce_wrapper(func):
-    def wrapper(*args):
+    def wrapper(message: Message):
         try:
-            func(args)
+            func(message)
         except:
             logger.info('smth went wrong')
             time.sleep(5)
-            func(args)
+            func(message)
 
     return wrapper
 
