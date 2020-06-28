@@ -56,14 +56,14 @@ def gce_wrapper(func):
 @gce_wrapper
 def greet(message: Message):
     bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
-    db_worker.set_state(message.chat.id, States.START.value)
+    db_worker.set_state(message.chat.id, States.START)
 
 
 @bot.message_handler(commands=['reset'])
 @gce_wrapper
 def cmd_reset(message: Message):
     bot.send_message(message.chat.id, 'Hi there, type one of commands: /nst /srres')
-    db_worker.set_state(message.chat.id, States.START.value)
+    db_worker.set_state(message.chat.id, States.START)
 
 
 @bot.message_handler(commands=['help'])
@@ -79,18 +79,18 @@ def get_help(message: Message):
 @gce_wrapper
 def start_nst(message: Message):
     bot.reply_to(message, 'Now send me content photo')
-    db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC.value)
+    db_worker.set_state(message.chat.id, States.ENTER_FIRST_PIC)
 
 
 @bot.message_handler(commands=['srres'])
 @gce_wrapper
 def start_srres(message: Message):
     bot.reply_to(message, 'Now send me low res photo')
-    db_worker.set_state(message.chat.id, States.ENTER_SRRES_PHOTO.value)
+    db_worker.set_state(message.chat.id, States.ENTER_SRRES_PHOTO)
 
 
 @bot.message_handler(
-    func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SRRES_PHOTO.value,
+    func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SRRES_PHOTO,
     content_types=['photo'])
 @gce_wrapper
 def get_low_res(message: Message):
@@ -105,14 +105,14 @@ def get_low_res(message: Message):
     res = model.transform(f'./images/low_res{message.chat.id}.jpg')
     save_image(res, f'./images/res{message.chat.id}.jpg', normalize=True)
     bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
-    db_worker.set_state(message.chat.id, States.START.value)
+    db_worker.set_state(message.chat.id, States.START)
 
     for file in ['low_res', 'res']:
         if os.path.exists(f'./images{file}{message.chat.id}.jpg'):
             os.remove(f'./images{file}{message.chat.id}.jpg')
 
 
-@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC.value,
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_FIRST_PIC,
                      content_types=['photo'])
 @gce_wrapper
 def get_content(message: Message):
@@ -125,10 +125,10 @@ def get_content(message: Message):
     bot.send_message(message.chat.id, 'Now send me style photo. If you want to specify '
                                       'size send it within your style photo. '
                                       'Size should be less than 512.')
-    db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC.value)
+    db_worker.set_state(message.chat.id, States.ENTER_SECOND_PIC)
 
 
-@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC.value,
+@bot.message_handler(func=lambda message: db_worker.get_current_state(message.chat.id) == States.ENTER_SECOND_PIC,
                      content_types=['photo'])
 @gce_wrapper
 def get_style(message: Message):
@@ -149,7 +149,7 @@ def get_style(message: Message):
     save_image(res, f'./images/res{message.chat.id}.jpg', normalize=True)
 
     bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
-    db_worker.set_state(message.chat.id, States.START.value)
+    db_worker.set_state(message.chat.id, States.START)
 
     for file in ['content', 'style', 'res']:
         if os.path.exists(f'./images{file}{message.chat.id}.jpg'):
