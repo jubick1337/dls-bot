@@ -8,6 +8,7 @@ from aiohttp import web
 from aiohttp.abc import Request
 from telebot import apihelper
 from telebot.types import Message
+from torchvision.utils import save_image
 
 from model.nst import NST
 from model.srres import SRRes
@@ -117,7 +118,8 @@ def get_low_res(message: Message):
         model = SRRes()
 
         res = model.transform(f'./images/low_res{message.chat.id}.jpg')
-        res.save(f'./images/res{message.chat.id}.jpg')
+        save_image(res, f'./images/res{message.chat.id}.jpg', normalize=True)
+        # res.save(f'./images/res{message.chat.id}.jpg')
         bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
         db_worker.set_state(message.chat.id, States.START.value)
 
@@ -138,7 +140,8 @@ def get_low_res(message: Message):
         model = SRRes()
 
         res = model.transform(f'./images/low_res{message.chat.id}.jpg')
-        res.save(f'./images/res{message.chat.id}.jpg')
+        save_image(res, f'./images/res{message.chat.id}.jpg', normalize=True)
+        # res.save(f'./images/res{message.chat.id}.jpg')
         bot.send_photo(message.chat.id, open(f'./images/res{message.chat.id}.jpg', 'rb'))
         db_worker.set_state(message.chat.id, States.START.value)
 

@@ -24,8 +24,9 @@ class SRRes:
         image = self._loader(image).unsqueeze(0)
         return image.to(self._device, torch.float)
 
-    def transform(self, input_image: str) -> Image.Image:
+    def transform(self, input_image: str) -> torch.Tensor:
         image = self._image_loader(input_image)
-        res = self._net(image)
-        with torch.no_grad():
-            return self._unloader(res.squeeze_(0))
+        return self._net(image)
+        # res = self._net(image)
+        # with torch.no_grad():
+        #     return self._unloader(res.squeeze_(0))
