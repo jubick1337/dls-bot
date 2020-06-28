@@ -40,16 +40,30 @@ async def handle(request: Request):
 app.router.add_post('/{token}/', handle)
 
 
-@bot.message_handler(commands=['start'])
-def greet(message: Message):
+def gce_wrapper(func):
     try:
-        bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
-        db_worker.set_state(message.chat.id, States.START.value)
+        func()
     except:
         logger.info('smth went wrong')
         time.sleep(5)
-        bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
-        db_worker.set_state(message.chat.id, States.START.value)
+        func()
+
+
+@bot.message_handler(commands=['start'])
+@gce_wrapper
+def greet(message: Message):
+    bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
+    db_worker.set_state(message.chat.id, States.START.value)
+
+
+# try:
+#     bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
+#     db_worker.set_state(message.chat.id, States.START.value)
+# except:
+#     logger.info('smth went wrong')
+#     time.sleep(5)
+#     bot.reply_to(message, 'Hi there, type one of commands: /nst /srres')
+#     db_worker.set_state(message.chat.id, States.START.value)
 
 
 @bot.message_handler(commands=['reset'])
