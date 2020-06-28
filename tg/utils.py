@@ -16,7 +16,7 @@ WEBHOOK_URL_BASE = f'https://{WEBHOOK_HOST}:{WEBHOOK_PORT}'
 WEBHOOK_URL_PATH = f'/{TELEGRAM_TOKEN}/'
 
 
-class States(Enum, str):
+class States(str, Enum):
     START = '0'
     ENTER_COMMAND = '1'
     ENTER_FIRST_PIC = '2'
